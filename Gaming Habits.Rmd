@@ -1,0 +1,203 @@
+---
+title: "Gaming Habits"
+author: "Suhas V"
+date: "2023-04-20"
+output: pdf_document
+---
+
+```{r}
+
+# Load the Excel Sheet
+
+library(readxl)
+my_data <- read_excel("habits_survey.xlsx")
+
+my_data
+
+```
+
+```{r}
+# Column 1
+my_data$question1 <-as.numeric(factor(my_data$question1, 
+                                      levels=c("Yes", "No")))
+
+# More than one hour or less than one hour
+my_data$question1 <- replace(my_data$question1, my_data$question1 == 2, 0)
+
+# Column 2
+
+my_data$question2 <-as.numeric(factor(my_data$question2, 
+                                      levels=c("Never", "Daily",
+                                               "Several times a week", 
+                                               "Less than once a week", 
+                                               "Once a week")))
+
+# Column 3
+
+my_data$question3 <-as.numeric(factor(my_data$question3, 
+                                      levels=c("Always", "Often",
+                                               "Sometimes", "Rarely", "Never")))
+
+# Column 4
+
+my_data$question4 <-as.numeric(factor(my_data$question4, 
+                                      levels=c("Yes", "No")))
+
+# More than one hour or less than one hour
+my_data$question4 <- replace(my_data$question4, my_data$question4 == 2, 0)
+
+
+# Column 5
+my_data$question5 <-as.numeric(factor(my_data$question5, 
+                                      levels=c("Less than 1 hour", "1-2 hours",
+                                               "More than 2 hours")))
+# More than one hour or less than one hour
+my_data$question5 <- replace(my_data$question5, my_data$question5 == 1, 0)
+my_data$question5 <- replace(my_data$question5, my_data$question5 == 3, 1)
+my_data$question5 <- replace(my_data$question5, my_data$question5 == 2, 0)
+
+# Column 6
+
+my_data$question6 <-as.numeric(factor(my_data$question6, 
+                                      levels=c("Yes", "No")))
+
+# More than one hour or less than one hour
+my_data$question6 <- replace(my_data$question6, my_data$question6 == 2, 0)
+
+# Column 7
+
+my_data$question7 <-as.numeric(factor(my_data$question7, 
+                                      levels=c("Yes", "No", "Maybe")))
+
+# More than one hour or less than one hour
+my_data$question7 <- replace(my_data$question7, my_data$question7 == 2, 0)
+my_data$question7 <- replace(my_data$question7, my_data$question7 == 3, 0)
+
+# Column 8
+
+my_data$question8 <-as.numeric(factor(my_data$question8, 
+                                      levels=c("Yes, I was successful", 
+                                               "Yes, but I was not successful", 
+                                               "No, I have not tried")))
+my_data$question8 <- replace(my_data$question8, my_data$question8 == 2, 0)
+my_data$question8 <- replace(my_data$question8, my_data$question8 == 3, 0)
+
+# Column 9
+
+my_data$question9 <-as.numeric(factor(my_data$question9, 
+                                      levels=c("Yes", "No")))
+my_data$question9 <- replace(my_data$question9, my_data$question9 == 2, 0)
+
+
+# Column 10
+my_data$question10 <-as.numeric(factor(my_data$question10, 
+                                      levels=c("Yes", "No")))
+
+my_data$question10 <- replace(my_data$question10, my_data$question10 == 2, 0)
+
+# Column 11
+
+my_data$question11 <-as.numeric(factor(my_data$question11, 
+                                      levels=c("Yes", "No")))
+my_data$question11 <- replace(my_data$question11, my_data$question11 == 2, 0)
+
+
+# Column 12
+
+my_data$question12 <-as.numeric(factor(my_data$question12, 
+                                      levels=c("9 <= CGPA <=10", 
+                                               "8 <= CGPA < 9", 
+                                               "7 <= CGPA < 8", "CGPA < 7")))
+my_data$question12 <- replace(my_data$question12, my_data$question12 == 
+                                2, 1)
+my_data$question12 <- replace(my_data$question12, my_data$question12 == 
+                                3, 0)
+my_data$question12 <- replace(my_data$question12, my_data$question12 == 
+                                4, 0)
+
+
+
+
+my_data
+
+unique(my_data$question7)
+
+```
+```{r}
+
+t.test(my_data$question12[my_data$question5 == 1], my_data$question12[my_data$question5 == 0])
+
+```
+
+```{r}
+library(ggplot2)
+
+
+# Set the plot as an object
+my_plot <- ggplot(my_data, aes(x=ifelse(question5==0, "Less than 2 hour", "More than 2 hour"))) + 
+  geom_bar(fill = "steelblue") + 
+  ggtitle("Distribution of People") + 
+  xlab("Hours of gaming per day") + 
+  ylab("Number of students in the group") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 14),
+        panel.background = element_rect(fill = "white")) +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.5, size=5, color="white")
+
+# Save the plot as a png file
+ggsave("my_plot.png", my_plot, width = 8, height = 6, dpi = 300)
+```
+
+
+```{r}
+
+cont_table <- table(my_data$question5, my_data$question12)
+cont_table
+
+chisq.test(cont_table)
+
+```
+```{r}
+
+```
+```{r}
+library(car)
+vif_values <- vif(lm(question12 ~ ., data = my_data))
+vif_values
+
+qqnorm(my_data$question12)
+qqline(my_data$question12)
+
+# Create a question12 of column1 and column2
+plot(my_data$question5, my_data$question12)
+
+# Add a smooth line to the plot
+lines(lowess(my_data$question5, my_data$question12), col="red")
+
+```
+
+```{r}
+
+# plot the data using ggplot2
+library(ggplot2)
+ggplot(my_data, aes(x=question5, y=question12)) + 
+  geom_point() + 
+  labs(x="Question 5", y="Question 12") + 
+  ggtitle("Scatter plot of Question 5 and Question 12")
+
+# perform linear regression
+model <- lm(question12 ~ question5, data = my_data)
+
+# add the regression line to the plot
+ggplot(my_data, aes(x=question5, y=question12)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se=FALSE) + 
+  labs(x="Normalised Question 5 (hours of gaming)", y="Normalised Question 12 (GPA)") + 
+  ggtitle("Regression of Question 12 on Question 5")
+
+
+
+
+```
+
